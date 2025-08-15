@@ -1,4 +1,4 @@
-#![feature(portable_simd, array_chunks)]
+#![feature(portable_simd, iter_array_chunks)]
 
 use std::{
     ops::BitAnd,
@@ -103,12 +103,12 @@ impl<'a> From<Pattern<'a>> for PreparedPattern {
         mask_extended[0..pat.len()].copy_from_slice(&mask);
 
         let chunks: Vec<PatternChunk> = bytes_extended
-            .array_chunks::<BYTES>()
-            .zip(mask_extended.array_chunks::<BYTES>())
+            .into_iter().array_chunks::<BYTES>()
+            .zip(mask_extended.into_iter().array_chunks::<BYTES>())
             .map(|(bytes, mask)| PatternChunk {
                 first_byte: Simd::from_array([bytes[0]; BYTES]),
-                mask: Mask::from_array(*mask),
-                bytes: Simd::from_array(*bytes),
+                mask: Mask::from_array(mask),
+                bytes: Simd::from_array(bytes),
             })
             .collect();
 
